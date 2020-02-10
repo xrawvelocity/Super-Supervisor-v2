@@ -15,9 +15,17 @@ export default new Phaser.Class({
         this.load.bitmapFont('Click-Pixel', 'assets/fonts/click.png', 'assets/fonts/click.xml');
         this.load.audio('menuMusic', '../assets/sound effects/menuMusic.mp3');
         this.load.image('fired', '../assets/fired.png');
+        this.load.audio("sndBtnOver", "./assets/sound effects/sndBtnOver.wav");
+        this.load.audio("sndBtnDown", "./assets/sound effects/sndBtnDown.wav");
     },
   
     create() {
+  
+        // sounds
+        this.sfx = {
+            btnOver: this.sound.add("sndBtnOver"),
+            btnDown: this.sound.add("sndBtnDown")
+        };
   
         // Music
         this.music = this.sound.add('menuMusic', {
@@ -67,6 +75,7 @@ export default new Phaser.Class({
         restartButton.setInteractive();
 
         restartButton.on('pointerover', ()=>{
+            this.sfx.btnOver.play();
             restartButton.setScale(1.2);
             restartButton.x = Math.round(0.245 * 1150);
             restartButton.y = Math.round(0.46 * 690);
@@ -76,6 +85,10 @@ export default new Phaser.Class({
             restartButton.setScale(1);
             restartButton.x = Math.round(0.295 * 1150);
             restartButton.y = Math.round(0.47 * 690);
+        });
+
+        restartButton.on('pointerdown', ()=>{
+            this.sfx.btnDown.play();
         });
 
         restartButton.on('pointerup', ()=>{

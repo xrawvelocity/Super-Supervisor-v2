@@ -1,5 +1,7 @@
-import play from './play.js';
 import menu from './menu.js';
+import playEasy from './playEasy.js';
+import playNormal from './playNormal.js';
+import playHard from './playHard.js';
 import gameover from './gameover.js';
 
 var config = {
@@ -12,15 +14,15 @@ var config = {
           gravity: {
               y: 500
           },
-          debug: true
+          debug: false
       }
   },
   render: {
     pixelArt: true
   },
 
-  scene: [menu, play, gameover]
+  scene: [menu, playEasy, playNormal, playHard, gameover]
 };
 
-var game = new Phaser.Game(config);
+new Phaser.Game(config);
 

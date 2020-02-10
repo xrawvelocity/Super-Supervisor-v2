@@ -13,12 +13,20 @@ export default new Phaser.Class({
         this.CONFIG = this.sys.game.CONFIG;
     },
     preload: function() {
-        this.load.image('titleBg', '../assets/officebg.jpeg');
-        this.load.bitmapFont('Click-Pixel', '../assets/fonts/click.png', '../assets/fonts/click.xml');
-        this.load.audio('menuMusic', '../assets/sound effects/menuMusic.mp3');
+        this.load.image('titleBg', './assets/officebg.jpeg');
+        this.load.bitmapFont('Click-Pixel', './assets/fonts/click.png', './assets/fonts/click.xml');
+        this.load.audio('menuMusic', './assets/sound effects/menuMusic.mp3');
+        this.load.audio("sndBtnOver", "./assets/sound effects/sndBtnOver.wav");
+        this.load.audio("sndBtnDown", "./assets/sound effects/sndBtnDown.wav");
     },
   
     create() {
+        
+        // sounds
+        this.sfx = {
+            btnOver: this.sound.add("sndBtnOver"),
+            btnDown: this.sound.add("sndBtnDown")
+        };
   
         // Music
         this.music = this.sound.add('menuMusic', {
@@ -45,11 +53,25 @@ export default new Phaser.Class({
             64
         );
         // Click to play text
-        let playButton = this.add.bitmapText(
-            Math.round(0.405 * 1150),
+        let playBtnEasy = this.add.bitmapText(
+            Math.round(0.205 * 1150),
             Math.round(0.35 * 690),
             'Click-Pixel',
-            'click to play',
+            'Play Easy',
+            48
+        );
+        let playBtnNormal = this.add.bitmapText(
+            Math.round(0.41 * 1150),
+            Math.round(0.35 * 690),
+            'Click-Pixel',
+            'Play Normal',
+            48
+        );
+        let playBtnHard = this.add.bitmapText(
+            Math.round(0.645 * 1150),
+            Math.round(0.35 * 690),
+            'Click-Pixel',
+            'Play Hard',
             48
         );
 
@@ -71,23 +93,78 @@ export default new Phaser.Class({
   
         // Make play button interactive
         
-        playButton.setInteractive();
+        playBtnEasy.setInteractive();
 
-        playButton.on('pointerover', ()=>{
-            playButton.setScale(1.2);
-            playButton.x = Math.round(0.385 * 1150);
-            playButton.y = Math.round(0.34 * 690);
+        playBtnEasy.on('pointerover', ()=>{
+            this.sfx.btnOver.play();
+            playBtnEasy.setScale(1.2);
+            playBtnEasy.x = Math.round(0.185 * 1150);
+            playBtnEasy.y = Math.round(0.34 * 690);
         });
 
-        playButton.on('pointerout', ()=>{
-            playButton.setScale(1);
-            playButton.x = Math.round(0.405 * 1150);
-            playButton.y = Math.round(0.35 * 690);
+        playBtnEasy.on('pointerout', ()=>{
+            playBtnEasy.setScale(1);
+            playBtnEasy.x = Math.round(0.205 * 1150);
+            playBtnEasy.y = Math.round(0.35 * 690);
         });
 
-        playButton.on('pointerup', ()=>{
+        playBtnEasy.on('pointerdown', ()=>{
+            this.sfx.btnDown.play();
+        });
+
+        playBtnEasy.on('pointerup', ()=>{
             this.music.stop();
-            this.scene.start('play');
+            this.scene.start('playEasy');
+        });
+
+
+        playBtnNormal.setInteractive();
+
+        playBtnNormal.on('pointerover', ()=>{
+            this.sfx.btnOver.play();
+            playBtnNormal.setScale(1.2);
+            playBtnNormal.x = Math.round(0.39 * 1150);
+            playBtnNormal.y = Math.round(0.34 * 690);
+        });
+
+        playBtnNormal.on('pointerout', ()=>{
+            playBtnNormal.setScale(1);
+            playBtnNormal.x = Math.round(0.41 * 1150);
+            playBtnNormal.y = Math.round(0.35 * 690);
+        });
+
+        playBtnNormal.on('pointerdown', ()=>{
+            this.sfx.btnDown.play();
+        });
+
+        playBtnNormal.on('pointerup', ()=>{
+            this.music.stop();
+            this.scene.start('playNormal');
+        });
+
+
+        playBtnHard.setInteractive();
+
+        playBtnHard.on('pointerover', ()=>{
+            this.sfx.btnOver.play();
+            playBtnHard.setScale(1.2);
+            playBtnHard.x = Math.round(0.625 * 1150);
+            playBtnHard.y = Math.round(0.34 * 690);
+        });
+
+        playBtnHard.on('pointerout', ()=>{
+            playBtnHard.setScale(1);
+            playBtnHard.x = Math.round(0.645 * 1150);
+            playBtnHard.y = Math.round(0.35 * 690);
+        });
+
+        playBtnHard.on('pointerdown', ()=>{
+            this.sfx.btnDown.play();
+        });
+
+        playBtnHard.on('pointerup', ()=>{
+            this.music.stop();
+            this.scene.start('playHard');
         });
 
     }

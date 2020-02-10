@@ -4,16 +4,15 @@ import {score} from './globals.js';
 
 //You can access the globals via the imported file,  all scenes would be using the same instance of the globals
 
-let map, player, bullets, office, startingTime, currentTime, hurt, jump;
+let map, player, office, startingTime, currentTime, hurt, jump;
 let enemyArr = [];
-let bulletArr = [];
 var health = 100;
 
 export default new Phaser.Class({
   Extends: Phaser.Scene,
   initialize: function play() {
       Phaser.Scene.call(this, {
-          key: 'play',
+          key: 'playNormal',
           active: false
       });
   },
@@ -59,7 +58,6 @@ export default new Phaser.Class({
 
     create() {
 
-        console.log("PLAY SCENE LOADED");
         ////////////////////////////////////////////////////////////////
         //IMPORTANT VARIABLES AND PHYSICS
 
@@ -73,7 +71,7 @@ export default new Phaser.Class({
 
         this.music = this.sound.add('musicSnd', {
             mute: false,
-            volume: 1,
+            volume: 0.75,
             rate: 1,
             detune: 0,
             seek: 0,
@@ -116,15 +114,14 @@ export default new Phaser.Class({
         this.cameras.main.startFollow(player);
 
         //bullet group
-        bullets = this.physics.add.group();
-
+        //bullets = this.physics.add.group();
 
         //////////////////////////////////////////////////
+
 
 
         //////////////////////////////////////////////////
         //ANIMATIONS
-
 
         // player walk animation
         this.anims.create({
@@ -222,14 +219,13 @@ export default new Phaser.Class({
             fontSize: '35px',
             fontWeight: '500',
             backgroundColor: '#000'
-        });
+        }).setDepth(1);
 
-        this.healthText = this.add.text(20, 20, 'Health: ', {
+        this.healthText = this.add.text(20, 20, 'Health:  ', {
             fontSize: '35px',
             fontWeight: '500',
             backgroundColor: '#000'
-        });
-
+        }).setDepth(0);
 
         this.healthNumber.setScrollFactor(0);
 
@@ -242,10 +238,10 @@ export default new Phaser.Class({
         this.enemy = this.physics.add.group();
 
         setInterval(() => {
-            if (enemyArr.length <= 3) {
-                var x = Phaser.Math.Between(800, 1000);
+            if (enemyArr.length <= 5) {
+                var x = Phaser.Math.Between(750, 1050);
                 this.enemy = this.physics.add.sprite(x, 0, 'enemy');
-                this.enemy.setVelocity(Phaser.Math.Between(-500, -100), 100);
+                this.enemy.setVelocity(Phaser.Math.Between(-600, -200), 200);
             }
             this.physics.world.bounds.width = office.width;
             this.physics.world.bounds.height = 600;
@@ -258,6 +254,7 @@ export default new Phaser.Class({
 
             this.enemy.allowGravity = true;
             enemyArr.push(this.enemy);
+
             this.physics.add.collider(player, this.enemy, this.damage, null, this);
 
             enemyArr.forEach((enem, i) => {
@@ -271,7 +268,6 @@ export default new Phaser.Class({
 
         }, 1000);
 
-        this.physics.add.collider(player, this.enemy, this.damage, null, this);
 
         //////////////////////////////////////////////////  
 
@@ -284,7 +280,7 @@ export default new Phaser.Class({
       currentTime = new Date().getTime();
       score.value += Math.floor(Math.floor((currentTime - startingTime)) / 2000);
       score.value = Math.floor(score.value / 1.2);
-      this.add.text(140, 60, score.value, {
+      this.add.text(165, 60, score.value, {
           fontSize: '35px',
           fill: '#fff',
           backgroundColor: '#000'
@@ -310,7 +306,7 @@ export default new Phaser.Class({
 
       if(health < -1){
           this.music.stop();
-          this.scene.remove('play');
+          this.scene.remove('playNormal');
           this.scene.start('gameover');
       }
     
@@ -335,8 +331,19 @@ export default new Phaser.Class({
 
       //////////////////////////////////////////////////
       //PLAYER MOVEMENT AND JUMPING
+      //player running
+      if (this.cursors.left.isDown && this.cursors.shift.isDown || this.keyboard.A.isDown && this.cursors.shift.isDown) {
+        player.body.setVelocityX(-400);
+        player.anims.play('walk', true); // walk left
+        player.flipX = true; // flip the sprite to the left
+      } else if (this.cursors.right.isDown && this.cursors.shift.isDown || this.keyboard.D.isDown && this.cursors.shift.isDown) {
+        player.body.setVelocityX(400);
+        player.anims.play('walk', true);
+        player.flipX = false; // use the original sprite looking to the right
+    }
 
-      if (this.cursors.left.isDown || this.keyboard.A.isDown) {
+     // player walking
+     else if (this.cursors.left.isDown || this.keyboard.A.isDown) {
           player.body.setVelocityX(-200);
           player.anims.play('walk', true); // walk left
           player.flipX = true; // flip the sprite to the left
@@ -350,28 +357,16 @@ export default new Phaser.Class({
           }
       }
 
-      //player running
-      else if (this.cursors.left.isDown || this.keyboard.A.isDown && this.cursors.shift.isDown) {
-          this.player.body.setVelocityX(-200);
-          this.player.anims.play('walk', true); // walk left
-          this.player.flipX = true; // flip the sprite to the left
-      } else if (this.cursors.right.isDown || this.keyboard.D.isDown && this.cursors.shift.isDown) {
-          this.player.body.setVelocityX(200);
-          this.player.anims.play('walk', true);
-          this.player.flipX = false; // use the original sprite looking to the right
-      }
-
       //player idle
       else if (player.body.onFloor()) {
           player.body.setVelocityX(0);
           player.anims.play('idle', true);
       }
 
-      // jump 
-      if (this.cursors.up.isDown || this.keyboard.W.isDown && player.body.onFloor()) {
-          jump.play();
+       // jump 
+      if (this.cursors.up.isDown && player.body.onFloor() || this.keyboard.W.isDown && player.body.onFloor()) {
           player.anims.play('jump', true);
-          player.body.setVelocityY(-500);
+          player.body.setVelocityY(-450);
       } else if (!player.body.onFloor() && player.y < 500) {
           player.anims.play('jump', true);
       }
@@ -382,62 +377,57 @@ export default new Phaser.Class({
           player.body.x = 1100;
       }
 
-      if (this.cursors.space.isDown) {
-          player.anims.play('shoot', true);
-          if (bulletArr < 1) {
-              if (player.flipX == false) {
-                  bullet = bullets.create(player.body.x, player.body.y + 20, 'bullet', 64, 64);
-                  bullet.body.setVelocity(1000, 0);
-                  bulletArr.push(bullet);
-                  bullet.body.gravity.y = -400;
-                  bullet.setBounce(0.1); // our bullet will bounce from items
-                  bullet.setCollideWorldBounds(true); // don't go out of the map    
-                  // small fix to our bullet images, we resize the physics body object slightly
-                  bullet.body.setSize(32, 45);
-                  bullet.setScale(0.03);
+    //   if (this.cursors.space.isDown) {
+    //       player.anims.play('shoot', true);
+    //       if (bulletArr < 1) {
+    //           if (player.flipX == false) {
+    //               bullet = bullets.create(player.body.x, player.body.y + 20, 'bullet', 64, 64);
+    //               bullet.body.setVelocity(1000, 0);
+    //               bulletArr.push(bullet);
+    //               bullet.body.gravity.y = -400;
+    //               bullet.setBounce(0.1); // our bullet will bounce from items
+    //               bullet.setCollideWorldBounds(true); // don't go out of the map    
+    //               // small fix to our bullet images, we resize the physics body object slightly
+    //               bullet.body.setSize(32, 45);
+    //               bullet.setScale(0.03);
 
-              } else if (player.flipX == true) {
-                  bullet = bullets.create(player.body.x, player.body.y + 20, 'bullet', 64, 64);
-                  bullet.body.setVelocity(-1000, 0);
-                  bulletArr.push(bullet);
-                  bullet.body.gravity.y = -400;
-                  bullet.setBounce(0.1); // our bullet will bounce from items
-                  bullet.setCollideWorldBounds(true); // don't go out of the map    
-                  // small fix to our bullet images, we resize the physics body object slightly
-                  bullet.body.setSize(32, 45);
-                  bullet.setScale(0.03);
+    //           } else if (player.flipX == true) {
+    //               bullet = bullets.create(player.body.x, player.body.y + 20, 'bullet', 64, 64);
+    //               bullet.body.setVelocity(-1000, 0);
+    //               bulletArr.push(bullet);
+    //               bullet.body.gravity.y = -400;
+    //               bullet.setBounce(0.1); // our bullet will bounce from items
+    //               bullet.setCollideWorldBounds(true); // don't go out of the map    
+    //               // small fix to our bullet images, we resize the physics body object slightly
+    //               bullet.body.setSize(32, 45);
+    //               bullet.setScale(0.03);
 
-              }
+    //           }
 
 
-              console.log(bulletArr);
-          }
-          bulletArr.forEach((bullet, i) => {
+    //           console.log(bulletArr);
+    //       }
+    //       bulletArr.forEach((bullet, i) => {
 
-              if (bullet.body.position.x > 1150) {
-                  bulletArr.splice(i, 1);
-                  bullet.disableBody(true, true);
+    //           if (bullet.body.position.x > 1150) {
+    //               bulletArr.splice(i, 1);
+    //               bullet.disableBody(true, true);
 
-              }
-          });
-          bulletArr.forEach((bullet, i) => {
-              console.log(bullet.body.position.x, i);
-              if (bullet.body.position.x < 10) {
-                  bulletArr.splice(i, 1);
-                  bullet.disableBody(true, true);
+    //           }
+    //       });
+    //       bulletArr.forEach((bullet, i) => {
+    //           console.log(bullet.body.position.x, i);
+    //           if (bullet.body.position.x < 10) {
+    //               bulletArr.splice(i, 1);
+    //               bullet.disableBody(true, true);
 
-              }
-          });
+    //           }
+    //       });
 
           //////////////////////////////////////////////////
-      }
+     // }
   },
 
-  addScore() {
-      const startTime = new Date();
-      console.log(startTime.getTime());
-
-  },
   damage() {
       player.y -= 10;
       hurt.play();
@@ -448,21 +438,9 @@ export default new Phaser.Class({
 
       player.anims.play('turn');
 
-      health -= 3;
+      health -= 4;
       this.healthNumber.setText(health);
-  },
-
-  showGameOver() {
-      this.scene.start('gameover');
-      //hide UI elements
-
-      //show the game over overlay
-
-      //listen to events from game over scene
   }
 });
-
-
-
 
 ///////////////////////////////////////
