@@ -17,10 +17,13 @@ export default new Phaser.Class({
         this.load.image('fired', '../assets/fired.png');
         this.load.audio("sndBtnOver", "./assets/sound effects/sndBtnOver.wav");
         this.load.audio("sndBtnDown", "./assets/sound effects/sndBtnDown.wav");
+        this.load.atlas('player', '../assets/player1.png', '../assets/player.json');
     },
   
     create() {
-  
+
+        
+        
         // sounds
         this.sfx = {
             btnOver: this.sound.add("sndBtnOver"),
@@ -69,12 +72,36 @@ export default new Phaser.Class({
             `Your score was: ${score.value}`,
             48
         );
+        
+        // player falling
+        let player = this.add.sprite(200, 400, 'player', 64, 64);
+        player.setScale(2);
+        player.setDepth(1);
+        player.setVisible(false);
+
+        //player dying animation
+        this.anims.create({
+            key: 'fall',
+            frames: this.anims.generateFrameNames('player', {
+                prefix: 'p1_fall',
+                start: 1,
+                end: 6,
+                zeroPad: 2
+            }),
+            frameRate: 10,
+            repeat: 0
+        });
+
   
         // Make play button interactive
         
         restartButton.setInteractive();
 
         restartButton.on('pointerover', ()=>{
+            player.setVisible(true);
+            player.x = 245;
+            player.y = 325;
+            player.play('fall', false);
             this.sfx.btnOver.play();
             restartButton.setScale(1.2);
             restartButton.x = Math.round(0.245 * 1150);
@@ -82,6 +109,7 @@ export default new Phaser.Class({
         });
 
         restartButton.on('pointerout', ()=>{
+            player.setVisible(false);
             restartButton.setScale(1);
             restartButton.x = Math.round(0.295 * 1150);
             restartButton.y = Math.round(0.47 * 690);

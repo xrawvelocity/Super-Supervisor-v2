@@ -304,7 +304,7 @@ export default new Phaser.Class({
           this.healthNumber.setFill('#f00');
       }
 
-      if(health < -1){
+      if(health <= 0){
           this.music.stop();
           this.scene.remove('playNormal');
           this.scene.start('gameover');
