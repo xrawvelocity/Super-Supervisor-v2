@@ -341,6 +341,10 @@ export default new Phaser.Class({
         player.body.setVelocityX(350);
         player.anims.play('walk', true);
         player.flipX = false; // use the original sprite looking to the right
+        if (player.body.x > 1100) {
+            player.body.setVelocity(0);
+
+        }
     }
 
      // player walking
