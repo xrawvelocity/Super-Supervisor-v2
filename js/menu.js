@@ -18,6 +18,20 @@ export default new Phaser.Class({
         this.load.audio('menuMusic', './assets/sound effects/menuMusic.mp3');
         this.load.audio("sndBtnOver", "./assets/sound effects/sndBtnOver.wav");
         this.load.audio("sndBtnDown", "./assets/sound effects/sndBtnDown.wav");
+
+        // loading bar
+
+        let loadingBar = this.add.graphics({
+            fillStyle: {
+               color: 0xffffff // white duh
+            }
+        });
+
+        // loading bar event
+
+        this.load.on('progress', percentage => {
+            loadingBar.fillRect(0, 690 / 2, 1150 * percentage, 50);
+        });
     },
   
     create() {
